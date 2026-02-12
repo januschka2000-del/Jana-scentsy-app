@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- 🍏 iPhone App Modus -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Jana Scentsy App</title>
+
+<style>
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont;
+  background:#ffffff;
+  margin:0;
+}
+
+.app{
+  width:90%;
+  margin:auto;
+  padding-top:20px;
+}
+
+h2{
+  text-align:center;
+}
+
+.input{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:#f2f2f7;
+  margin-bottom:15px;
+  font-size:16px;
+}
+
+.sectionTitle{
+  font-size:14px;
+  color:#8e8e93;
+  margin-top:10px;
+  margin-bottom:6px;
+}
+
+/* Duftgruppen */
+.duftgruppen{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.chip{
+  background:#f2f2f7;
+  padding:10px 16px;
+  border-radius:18px;
+  font-size:15px;
+  font-weight:500;
+  transition:0.25s;
+}
+
+.chip.active{
+  color:white;
+}
+
+/* Farben */
+.colorPicker{
+  display:flex;
+  gap:12px;
+  margin-top:8px;
+}
+
+.color{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  border:2px solid transparent;
+}
+
+.color.active{
+  border:2px solid black;
+}
+
+/* Bildfeld */
+.imageUpload{
+  width:100%;
+  height:220px;
+  margin-top:20px;
+  border-radius:22px;
+  background:#f2f2f7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  transition:0.4s;
+}
+
+.imageUpload input{
+  display:none;
+}
+
+#uploadText{
+  color:#8e8e93;
+  font-size:16px;
+}
+
+#preview{
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
+}
+
+/* Speichern Button */
+.saveBtn{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  background:#0a84ff;
+  color:white;
+  font-size:17px;
+  font-weight:600;
+  margin-top:20px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="app">
+
+<h2>Jana’s Scentsy App</h2>
+
+<input id="produktname" class="input" placeholder="Produktname">
+
+<div class="sectionTitle">Duftgruppe</div>
+<div class="duftgruppen">
+  <div class="chip" data-color="#ff9f0a">Fruchtig</div>
+  <div class="chip" data-color="#ffd60a">Zitrus</div>
+  <div class="chip" data-color="#ff2d55">Blumig</div>
+  <div class="chip" data-color="#d2691e">Bäckerei</div>
+  <div class="chip" data-color="#bf5af2">Würzig</div>
+  <div class="chip" data-color="#32ade6">Frisch</div>
+</div>
+
+<div class="sectionTitle">Farbe</div>
+<div class="colorPicker">
+  <div class="color" style="background:#ff2d55"></div>
+  <div class="color" style="background:#ffd60a"></div>
+  <div class="color" style="background:#30d158"></div>
+  <div class="color" style="background:#0a84ff"></div>
+  <div class="color" style="background:#bf5af2"></div>
+</div>
+
+<label class="imageUpload" id="imageUpload">
+  <input type="file" accept="image/*" onchange="previewImage(event)">
+  <span id="uploadText">+ Foto hinzufügen</span>
+  <img id="preview">
+</label>
+
+<button class="saveBtn" onclick="saveData()">Speichern</button>
+
+</div>
+
+<script>
+
+// 📸 Bild Vorschau
+function previewImage(event){
+  const img = document.getElementById("preview");
+  const text = document.getElementById("uploadText");
+
+  img.src = URL.createObjectURL(event.target.files[0]);
+  img.style.display = "block";
+  text.style.display = "none";
+
+  localStorage.setItem("bild", img.src);
+}
+
+// 🎨 Farbauswahl
+document.querySelectorAll(".color").forEach(el=>{
+  el.onclick=()=>{
+    document.querySelectorAll(".color").forEach(c=>c.classList.remove("active"));
+    el.classList.add("active");
+
+    localStorage.setItem("farbe", el.style.background);
+  }
+})
+
+// 🌸 Duftgruppen
+const imageField = document.getElementById("imageUpload");
+
+document.querySelectorAll(".chip").forEach(el=>{
+  el.onclick=()=>{
+    el.classList.toggle("active");
+
+    const active = document.querySelector(".chip.active");
+
+    if(active){
+      const color = active.dataset.color;
+      imageField.style.background =
+        "linear-gradient(180deg, "+color+"22, #f2f2f7)";
+      active.style.background = color;
+
+      localStorage.setItem("duft", active.innerText);
+    }
+  }
+})
+
+// 💾 SPEICHERN
+function saveData(){
+  const name = document.getElementById("produktname").value;
+  localStorage.setItem("produktname", name);
+  alert("Gespeichert ✅");
+}
+
+// 🔄 Laden
+window.onload = function(){
+
+  const name = localStorage.getItem("produktname");
+  if(name){
+    document.getElementById("produktname").value = name;
+  }
+
+  const bild = localStorage.getItem("bild");
+  if(bild){
+    const img = document.getElementById("preview");
+    img.src = bild;
+    img.style.display="block";
+    document.getElementById("uploadText").style.display="none";
+  }
+}
+
+</script>
+
+</body>
+</html>
